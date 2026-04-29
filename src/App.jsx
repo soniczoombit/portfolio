@@ -180,7 +180,8 @@ function App() {
         
         {/* Name — per-letter stagger animation */}
         <motion.div
-          className="overflow-hidden mb-4"
+          style={{ paddingBottom: "0.5rem" }}
+          className="mb-4"
           initial="hidden"
           animate="visible"
           variants={{ visible: { transition: { staggerChildren: 0.04, delayChildren: 0.3 } } }}
@@ -192,7 +193,14 @@ function App() {
                 hidden: { y: "110%", opacity: 0, rotate: char === " " ? 0 : (i % 2 === 0 ? -8 : 8) },
                 visible: { y: 0, opacity: 1, rotate: 0, transition: { type: "spring", damping: 14, stiffness: 160 } }
               }}
-              className={`inline-block ${char === " " ? "mr-4 md:mr-6" : ""} text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white via-gray-100 to-gray-500 pb-2`}
+              style={{
+                display: "inline-block",
+                marginRight: char === " " ? "1.25rem" : undefined,
+                color: "#ffffff",
+                lineHeight: 1.15,
+                paddingBottom: "0.25rem",
+              }}
+              className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight"
             >
               {char === " " ? "\u00A0" : char}
             </motion.span>
@@ -204,7 +212,7 @@ function App() {
           initial={{ scaleX: 0, opacity: 0 }}
           animate={{ scaleX: 1, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.9, ease: "easeOut" }}
-          className="w-24 h-px bg-white/30 mb-6 origin-left"
+          className="w-24 h-px mb-6 origin-left bg-white/50"
         />
 
         {/* Tagline */}
@@ -212,10 +220,11 @@ function App() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.0 }}
-          className="text-lg md:text-xl text-gray-400 font-medium mb-5 max-w-2xl tracking-wide"
+          className="text-lg md:text-xl text-white font-medium mb-5 max-w-2xl tracking-wide"
+          style={{ textShadow: '0 0 20px rgba(255,255,255,0.4)' }}
         >
           Computer Science-Focused Engineering Student
-          <span className="mx-3 text-gray-600">|</span>
+          <span className="mx-3 text-white/50">|</span>
           Web Development &amp; AI
         </motion.h2>
 
@@ -224,7 +233,8 @@ function App() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.1 }}
-          className="text-sm md:text-base text-gray-500 mb-12 max-w-xl leading-relaxed font-inter"
+          className="text-sm md:text-base text-white/80 mb-12 max-w-xl leading-relaxed font-inter"
+          style={{ textShadow: '0 0 15px rgba(255,255,255,0.3)' }}
         >
           Second-year Electronics and Computer Science student — building real products, one line at a time.
         </motion.p>
@@ -241,7 +251,8 @@ function App() {
           </HoverButton>
           <a
             href="#about"
-            className="text-sm text-gray-500 hover:text-white transition-colors tracking-wider uppercase"
+            className="text-sm text-white/70 hover:text-white transition-colors tracking-wider uppercase"
+            style={{ textShadow: '0 0 10px rgba(255,255,255,0.3)' }}
           >
             About me →
           </a>
@@ -254,7 +265,7 @@ function App() {
           transition={{ delay: 2, duration: 1 }}
           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
         >
-          <span className="text-xs text-gray-600 tracking-widest uppercase">Scroll</span>
+          <span className="text-xs text-white/50 tracking-widest uppercase">Scroll</span>
           <motion.div
             animate={{ y: [0, 8, 0] }}
             transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
