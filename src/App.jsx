@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, useInView } from "framer-motion";
 import HoverButton from "./components/HoverButton";
 import { HeroBackground } from "./components/HeroBackground";
@@ -43,6 +43,70 @@ function Section({ id, className, children, setActiveBg, bgName }) {
 
 function App() {
   const [activeBg, setActiveBg] = useState("hero");
+  const [activeProject, setActiveProject] = useState(null);
+
+  const projects = [
+    {
+      title: "Safora",
+      tagline: "A protective safety layer for every journey.",
+      image: "/safora-preview.jpg",
+      status: "Ongoing — Work in Progress",
+      overview: "Safora is a smart tourist safety and emergency response application designed to protect travellers in unfamiliar environments. It provides real-time safety intelligence, zone-based risk alerts, and instant emergency escalation — all in a single, intuitive interface.",
+      problem: "Tourists in unfamiliar cities often lack real-time situational awareness. There is no unified system that combines safety zone mapping, emergency response, and local risk intelligence into a single accessible tool.",
+      solution: "Safora aggregates live safety data, maps colour-coded risk zones, and provides a one-tap emergency pipeline — giving travellers a proactive safety layer rather than a reactive one.",
+      features: [
+        { name: "Live Safety Map", desc: "Colour-coded zones showing real-time risk levels across areas." },
+        { name: "SOS Emergency Button", desc: "One-tap escalation that alerts local authorities and emergency contacts." },
+        { name: "Zone Alerts", desc: "Push notifications when entering or approaching high-risk areas." },
+        { name: "Nearby Safe Spots", desc: "Locates hospitals, police stations, and shelters in proximity." },
+        { name: "Offline Mode", desc: "Core safety features accessible without an active internet connection." },
+      ],
+      techStack: {
+        Frontend: "React Native",
+        Backend: "Node.js / Express",
+        Database: "Firebase Realtime DB",
+        "APIs / Integrations": "Google Maps API, Twilio SMS",
+      },
+      impact: "Safora directly addresses personal safety gaps for travellers and tourists. By providing real-time risk intelligence and a fast emergency pipeline, it reduces response time in critical situations and gives users the confidence to explore unfamiliar places safely.",
+      future: [
+        "AI-powered predictive risk scoring based on historical incident data.",
+        "Community reporting — users can flag and verify incidents in real time.",
+        "Multi-language support for international travellers.",
+      ],
+      tags: ["React Native", "Node.js", "Firebase", "Maps API"],
+      github: "#",
+    },
+    {
+      title: "BookSpace",
+      tagline: "Smarter room booking for smarter departments.",
+      image: "/bookspace-preview.png",
+      status: "Ongoing — Core Features Built",
+      overview: "BookSpace is a full-stack faculty room and lab booking system built for the Electronics & Computer Science department at Fr. CRCE. It allows faculty to check real-time room availability, book slots around the fixed timetable, track absences, and interact with an AI assistant for scheduling — all in one dashboard.",
+      problem: "Faculty in the ECS department had no centralised system to check room availability or make ad-hoc bookings. Scheduling conflicts, double-bookings, and manual coordination were common pain points across 9 rooms and multiple time slots.",
+      solution: "BookSpace integrates the fixed department timetable directly into a smart booking engine. Faculty log in, see live room availability, and make bookings in seconds. An AI chatbot (powered by Gemini) handles conversational scheduling and cancellations.",
+      features: [
+        { name: "Live Room Grid", desc: "Real-time availability across all 9 classrooms and labs with conflict detection." },
+        { name: "Timetable-Aware Engine", desc: "Fixed schedule is baked in — bookings are automatically blocked during class hours." },
+        { name: "AI Chatbot", desc: "Gemini-powered assistant that understands natural language booking and cancellation requests." },
+        { name: "Absence Tracking", desc: "Faculty can log absences, freeing up timetable slots for ad-hoc bookings." },
+        { name: "Offline Fallback", desc: "Local storage fallback ensures functionality even when the backend is unreachable." },
+      ],
+      techStack: {
+        Frontend: "HTML, CSS, Vanilla JS",
+        Backend: "Node.js / Express",
+        Database: "Supabase (PostgreSQL)",
+        "APIs / Integrations": "Google Gemini API (OpenAI-compatible)",
+      },
+      impact: "BookSpace eliminates scheduling conflicts and reduces coordination overhead for the ECS department. It gives every faculty member real-time visibility into room usage, saving time and preventing double-bookings across a busy academic floor.",
+      future: [
+        "Role-based access — HOD override, admin dashboard, and read-only student view.",
+        "Calendar sync — export bookings directly to Google Calendar.",
+        "Mobile-responsive redesign for use on phones between lectures.",
+      ],
+      tags: ["Node.js", "Supabase", "Gemini AI", "Vanilla JS"],
+      github: "#",
+    },
+  ];
 
   const languages = [
     { name: "HTML", icon: <FaHtml5 className="text-orange-500" /> },
@@ -112,46 +176,93 @@ function App() {
       </nav>
 
       {/* HERO SECTION */}
-      <Section id="hero" bgName="hero" setActiveBg={setActiveBg} className="min-h-screen flex flex-col items-center justify-center px-6 py-24 text-center relative z-10 pt-32">
-        <div className="max-w-4xl mx-auto flex flex-col items-center bg-black/20 p-8 rounded-3xl backdrop-blur-sm border border-white/5">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-5xl md:text-7xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-500 pb-2"
-          >
-            Breyon Rodrigues
-          </motion.h1>
+      <Section id="hero" bgName="hero" setActiveBg={setActiveBg} className="min-h-screen flex flex-col items-center justify-center px-6 text-center relative z-10">
+        
+        {/* Name — per-letter stagger animation */}
+        <motion.div
+          className="overflow-hidden mb-4"
+          initial="hidden"
+          animate="visible"
+          variants={{ visible: { transition: { staggerChildren: 0.04, delayChildren: 0.3 } } }}
+        >
+          {"Breyon Rodrigues".split("").map((char, i) => (
+            <motion.span
+              key={i}
+              variants={{
+                hidden: { y: "110%", opacity: 0, rotate: char === " " ? 0 : (i % 2 === 0 ? -8 : 8) },
+                visible: { y: 0, opacity: 1, rotate: 0, transition: { type: "spring", damping: 14, stiffness: 160 } }
+              }}
+              className={`inline-block ${char === " " ? "mr-4 md:mr-6" : ""} text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white via-gray-100 to-gray-500 pb-2`}
+            >
+              {char === " " ? "\u00A0" : char}
+            </motion.span>
+          ))}
+        </motion.div>
 
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-xl md:text-2xl text-gray-300 font-medium mb-8 max-w-2xl"
-          >
-            Computer Science-Focused Engineering Student <span className="text-gray-500">|</span> Web Development & AI
-          </motion.h2>
+        {/* Divider line */}
+        <motion.div
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={{ scaleX: 1, opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.9, ease: "easeOut" }}
+          className="w-24 h-px bg-white/30 mb-6 origin-left"
+        />
 
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="text-base md:text-lg text-gray-400 mb-12 max-w-2xl leading-relaxed font-inter"
-          >
-            I’m a second-year Electronics and Computer Science student focused on building practical web applications and exploring AI-driven development.
-          </motion.p>
+        {/* Tagline */}
+        <motion.h2
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.0 }}
+          className="text-lg md:text-xl text-gray-400 font-medium mb-5 max-w-2xl tracking-wide"
+        >
+          Computer Science-Focused Engineering Student
+          <span className="mx-3 text-gray-600">|</span>
+          Web Development &amp; AI
+        </motion.h2>
 
+        {/* Description */}
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.1 }}
+          className="text-sm md:text-base text-gray-500 mb-12 max-w-xl leading-relaxed font-inter"
+        >
+          Second-year Electronics and Computer Science student — building real products, one line at a time.
+        </motion.p>
+
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.2 }}
+          className="flex flex-col sm:flex-row items-center gap-4"
+        >
+          <HoverButton onClick={() => window.location.href = "#projects"}>
+            View My Work
+          </HoverButton>
+          <a
+            href="#about"
+            className="text-sm text-gray-500 hover:text-white transition-colors tracking-wider uppercase"
+          >
+            About me →
+          </a>
+        </motion.div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2, duration: 1 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        >
+          <span className="text-xs text-gray-600 tracking-widest uppercase">Scroll</span>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-          >
-            <HoverButton onClick={() => window.location.href = "#projects"}>
-              View My Work
-            </HoverButton>
-          </motion.div>
-        </div>
+            animate={{ y: [0, 8, 0] }}
+            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+            className="w-px h-8 bg-gradient-to-b from-gray-600 to-transparent"
+          />
+        </motion.div>
       </Section>
+
 
       {/* ABOUT ME SECTION */}
       <Section id="about" bgName="about" setActiveBg={setActiveBg} className="py-40 px-6 relative z-10">
@@ -239,37 +350,22 @@ function App() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="max-w-4xl mx-auto text-center bg-black/40 backdrop-blur-md p-10 md:p-16 rounded-3xl border border-white/10"
+          className="max-w-5xl mx-auto text-center"
         >
           <h2 className="text-3xl md:text-5xl font-semibold mb-2">Projects</h2>
           <motion.div 
-            className="text-gray-500 text-xl md:text-2xl mb-8 flex justify-center flex-wrap"
+            className="text-gray-500 text-xl md:text-2xl mb-12 flex justify-center flex-wrap"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            variants={{
-              visible: { transition: { staggerChildren: 0.05 } }
-            }}
+            variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
           >
             {"(Work in Progress)".split("").map((char, i) => (
               <motion.span
                 key={i}
                 variants={{
-                  hidden: { 
-                    opacity: 0, 
-                    x: Math.random() * 100 - 50, 
-                    y: Math.random() * 100 - 50,
-                    rotate: Math.random() * 90 - 45,
-                    filter: "blur(10px)"
-                  },
-                  visible: { 
-                    opacity: 1, 
-                    x: 0, 
-                    y: 0, 
-                    rotate: 0,
-                    filter: "blur(0px)",
-                    transition: { type: "spring", damping: 12, stiffness: 200 }
-                  }
+                  hidden: { opacity: 0, x: Math.random() * 100 - 50, y: Math.random() * 100 - 50, rotate: Math.random() * 90 - 45, filter: "blur(10px)" },
+                  visible: { opacity: 1, x: 0, y: 0, rotate: 0, filter: "blur(0px)", transition: { type: "spring", damping: 12, stiffness: 200 } }
                 }}
                 className="inline-block whitespace-pre"
               >
@@ -277,26 +373,173 @@ function App() {
               </motion.span>
             ))}
           </motion.div>
-          <p className="text-gray-400 text-lg mb-16 max-w-2xl mx-auto font-inter">
-            I am currently building and refining projects to strengthen my development skills. This section will be updated with completed work soon.
-          </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-            {[1, 2].map((i) => (
-              <motion.div 
+            {projects.map((project, i) => (
+              <motion.div
                 key={i}
-                whileHover={{ y: -5 }}
-                className="p-8 rounded-2xl bg-white/10 border border-white/10 backdrop-blur-md min-h-[250px] flex flex-col justify-center items-center group cursor-pointer transition-all hover:border-white/30"
+                variants={fadeIn}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                whileHover={{ y: -8, scale: 1.01 }}
+                onClick={() => setActiveProject(project)}
+                className="group cursor-pointer rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 hover:border-white/30 transition-all duration-300 flex flex-col overflow-hidden"
               >
-                <div className="w-12 h-12 rounded-full border border-dashed border-gray-500 mb-4 flex items-center justify-center animate-[spin_10s_linear_infinite] group-hover:border-white">
-                  <div className="w-2 h-2 bg-gray-500 rounded-full group-hover:bg-white transition-colors"></div>
+                {/* Card Image */}
+                <div className="w-full h-44 overflow-hidden">
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
                 </div>
-                <h3 className="text-xl font-medium text-gray-300 group-hover:text-white transition-colors">Coming Soon</h3>
+
+                {/* Card Body */}
+                <div className="p-6 flex flex-col gap-4">
+                  {/* Card Header */}
+                  <div>
+                    <span className="text-xs font-medium px-2 py-1 rounded-full bg-white/10 text-gray-400 border border-white/10">
+                      {project.status}
+                    </span>
+                    <h3 className="text-2xl font-bold mt-3 group-hover:text-white transition-colors">{project.title}</h3>
+                    <p className="text-gray-500 text-sm mt-1 italic">{project.tagline}</p>
+                  </div>
+
+                  {/* Card Overview */}
+                  <p className="text-gray-400 text-sm leading-relaxed font-inter line-clamp-2">{project.overview}</p>
+
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-2 mt-auto">
+                    {project.tags.map((tag, j) => (
+                      <span key={j} className="text-xs px-2 py-1 rounded-md bg-white/5 border border-white/10 text-gray-400">{tag}</span>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center gap-2 text-sm text-gray-500 group-hover:text-white transition-colors mt-1">
+                    <span>View Details</span>
+                    <span>→</span>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>
         </motion.div>
       </Section>
+
+      {/* PROJECT DETAIL MODAL */}
+      {activeProject && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+          onClick={() => setActiveProject(null)}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 40, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ type: "spring", damping: 20, stiffness: 200 }}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#0a0a0a] border border-white/10 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 md:p-10 relative"
+          >
+            {/* Close */}
+            <button
+              onClick={() => setActiveProject(null)}
+              className="absolute top-5 right-5 text-gray-500 hover:text-white transition-colors text-2xl leading-none"
+            >
+              ✕
+            </button>
+
+            {/* Hero Image Banner */}
+            <div className="w-full h-52 rounded-2xl overflow-hidden mb-6 border border-white/10">
+              <img
+                src={activeProject.image}
+                alt={activeProject.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Header */}
+            <div className="mb-6">
+              <span className="text-xs font-medium px-2 py-1 rounded-full bg-white/10 text-gray-400 border border-white/10">{activeProject.status}</span>
+              <h2 className="text-3xl font-bold mt-3">{activeProject.title}</h2>
+              <p className="text-gray-400 italic mt-1">{activeProject.tagline}</p>
+            </div>
+
+            {/* Overview */}
+            <div className="mb-6">
+              <h4 className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-2">Overview</h4>
+              <p className="text-gray-300 text-sm leading-relaxed font-inter">{activeProject.overview}</p>
+            </div>
+
+            {/* Problem + Solution */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                <h4 className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-2">Problem</h4>
+                <p className="text-gray-300 text-sm leading-relaxed font-inter">{activeProject.problem}</p>
+              </div>
+              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                <h4 className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-2">Solution</h4>
+                <p className="text-gray-300 text-sm leading-relaxed font-inter">{activeProject.solution}</p>
+              </div>
+            </div>
+
+            {/* Features */}
+            <div className="mb-6">
+              <h4 className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-3">Core Features</h4>
+              <ul className="space-y-2">
+                {activeProject.features.map((f, i) => (
+                  <li key={i} className="flex gap-3 text-sm">
+                    <span className="text-white mt-0.5">◆</span>
+                    <span className="text-gray-300 font-inter"><span className="text-white font-medium">{f.name}</span> — {f.desc}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Tech Stack */}
+            <div className="mb-6">
+              <h4 className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-3">Tech Stack</h4>
+              <div className="grid grid-cols-2 gap-2">
+                {Object.entries(activeProject.techStack).map(([key, val]) => (
+                  <div key={key} className="p-3 rounded-xl bg-white/5 border border-white/10">
+                    <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">{key}</p>
+                    <p className="text-white text-sm font-medium">{val}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Impact */}
+            <div className="mb-6 p-4 rounded-xl bg-white/5 border border-white/10">
+              <h4 className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-2">Impact</h4>
+              <p className="text-gray-300 text-sm leading-relaxed font-inter">{activeProject.impact}</p>
+            </div>
+
+            {/* Future Scope */}
+            <div className="mb-8">
+              <h4 className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-3">Future Scope</h4>
+              <ul className="space-y-1">
+                {activeProject.future.map((f, i) => (
+                  <li key={i} className="text-gray-400 text-sm font-inter flex gap-2"><span className="text-gray-600">→</span>{f}</li>
+                ))}
+              </ul>
+            </div>
+
+            {/* GitHub Button */}
+            <a
+              href={activeProject.github}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/20 text-sm font-medium hover:bg-white hover:text-black transition-all duration-300"
+            >
+              <FaGithub />
+              {activeProject.github === "#" ? "View on GitHub — WIP, link soon" : "View on GitHub"}
+            </a>
+          </motion.div>
+        </motion.div>
+      )}
 
       {/* RESUME & CONTACT SECTION */}
       <Section id="contact" bgName="contact" setActiveBg={setActiveBg} className="py-40 px-6 relative z-10">

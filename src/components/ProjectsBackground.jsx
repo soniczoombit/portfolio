@@ -102,6 +102,7 @@ export function ProjectsBackground({
     `;
 
     // --- Scene Initialization ---
+    let geometry;
     const init = () => {
       scene = new THREE.Scene();
       camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -123,7 +124,7 @@ export function ProjectsBackground({
         },
       });
 
-      const geometry = new THREE.PlaneGeometry(2, 2);
+      geometry = new THREE.PlaneGeometry(2, 2);
       mesh = new THREE.Mesh(geometry, material);
       scene.add(mesh);
 
@@ -171,12 +172,16 @@ export function ProjectsBackground({
     return () => {
       removeEventListeners();
       cancelAnimationFrame(animationFrameId);
-      if (currentMount && renderer.domElement) {
-        currentMount.removeChild(renderer.domElement);
+      try {
+        if (renderer && currentMount && renderer.domElement && currentMount.contains(renderer.domElement)) {
+          currentMount.removeChild(renderer.domElement);
+        }
+        if (geometry) geometry.dispose();
+        if (material) material.dispose();
+        if (renderer) renderer.dispose();
+      } catch (e) {
+        // Silently ignore cleanup errors
       }
-      renderer.dispose();
-      material.dispose();
-      geometry.dispose();
     };
   }, [hue, speed, zoom, particleSize]);
 
